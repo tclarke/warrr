@@ -2,6 +2,7 @@ import falcon
 import os.path
 import mimetypes
 import logging
+from .views_v1 import views_v1
 
 app = falcon.API()
 
@@ -31,3 +32,5 @@ class StaticSink():
 
 static = StaticSink(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static")))
 app.add_sink(static, '/')
+for p, r in views_v1():
+    app.add_route(p, r)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from remodel.models import Model
 from remodel.connection import pool
+from remodel.models import Model
 
 pool.configure(db='game')
 
@@ -17,8 +17,19 @@ class User(Model):
     belongs_to = ('State', 'Game')
 
     @staticmethod
-    def factory(username, first_name, last_name):
-        return User.create(username=username, first_name=first_name, last_name=last_name)
+    def factory(username, first_name="", last_name="", roles=list()):
+        return User.create(username=username, first_name=first_name, last_name=last_name, roles=roles)
+
+
+def user_authenticate(ident):
+    user_rec = User.get(username=ident.login)
+    if user_rec is None:
+        return False
+    if 'roles' in user_rec:
+        ident.roles.update(user_rec['roles'])
+    if 'groups' in user_rec:
+        ident.groups.update(user_rec['groups'])
+    return True
 
 
 class State(Model):
@@ -58,3 +69,4 @@ if __name__ == '__main__':
     Piece.factory('Headquarters', 0., ['https://commons.wikimedia.org/wiki/File:NATO_Map_Symbol_-_Headquarters_Unit.svg#/media/File:NATO_Map_Symbol_-_Headquarters_Unit.svg'])
     Piece.factory('Light Infantry', 10., ['https://commons.wikimedia.org/wiki/File:NATO_Map_Symbol_-_Infantry_(Light).svg#/media/File:NATO_Map_Symbol_-_Infantry_(Light).svg'])
     Piece.factory('Mounted Infantry', 30., ['https://commons.wikimedia.org/wiki/File:NATO_Map_Symbol_-_Mounted_Infantry.svg#/media/File:NATO_Map_Symbol_-_Mounted_Infantry.svg'])
+    User.factory('admin', roles=["admin"])

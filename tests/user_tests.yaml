@@ -6,6 +6,7 @@
   - group: "User CRUD"
   - name: "Ensure user doesn't exist"
   - url: "/api/v1/user/testuser/"
+  - headers: {'Authorization': 'basic YWRtaW46'}
   - expected_status: [404]
 
 - test:
@@ -14,18 +15,28 @@
   - url: "/api/v1/user/"
   - method: "POST"
   - body: '{"username": "testuser", "first_name": "Test", "last_name": "User"}'
-  - headers: {'Content-Type': 'application/json'}
+  - headers: {'Content-Type': 'application/json', 'Authorization': 'basic YWRtaW46'}
   - validators:
     - compare: {header: location, comparator: contains, expected: '/api/v1/user/testuser/'}
 
 - test:
   - group: "User CRUD"
+  - name: "Create user #2"
+  - url: "/api/v1/user/"
+  - method: "POST"
+  - body: '{"username": "testuser2", "first_name": "Testie", "last_name": "User"}'
+  - headers: {'Content-Type': 'application/json', 'Authorization': 'basic YWRtaW46'}
+  - validators:
+    - compare: {header: location, comparator: contains, expected: '/api/v1/user/testuser2/'}
+
+- test:
+  - group: "User CRUD"
   - name: "Ensure user exists"
   - url: "/api/v1/user/testuser/"
+  - headers: {'Authorization': 'basic dGVzdHVzZXI6'}
   - validators:
     - compare: {header: content-type, comparator: contains, expected: 'json'}
     - compare: {jsonpath_mini: 'first_name', expected: 'Test'}
-    - compare: {jsonpath_mini: 'last_name', expected: 'User'}
 
 - test:
   - group: "User CRUD"
@@ -33,7 +44,7 @@
   - url: "/api/v1/user/testuser/"
   - method: "PUT"
   - body: '{"first_name": "Jimbo"}'
-  - headers: {'Content-Type': 'application/json'}
+  - headers: {'Content-Type': 'application/json', 'Authorization': 'basic dGVzdHVzZXI6'}
   - validators:
     - compare: {header: content-type, comparator: contains, expected: 'json'}
     - compare: {jsonpath_mini: 'first_name', expected: 'Jimbo'}
@@ -41,13 +52,39 @@
 
 - test:
   - group: "User CRUD"
+  - name: "Modify the user without permission"
+  - url: "/api/v1/user/testuser/"
+  - method: "PUT"
+  - body: '{"first_name": "James"}'
+  - headers: {'Content-Type': 'application/json', 'Authorization': 'basic dGVzdHVzZXIyOg=='}
+  - expected_status: [403]
+
+- test:
+  - group: "User CRUD"
+  - name: "Delete user without permision"
+  - url: "/api/v1/user/testuser/"
+  - headers: {'Authorization': 'basic dGVzdHVzZXI6'}
+  - method: "DELETE"
+  - expected_status: [403]
+
+- test:
+  - group: "User CRUD"
   - name: "Delete user"
   - url: "/api/v1/user/testuser/"
+  - headers: {'Authorization': 'basic YWRtaW46'}
+  - method: "DELETE"
+
+- test:
+  - group: "User CRUD"
+  - name: "Delete user #2"
+  - url: "/api/v1/user/testuser2/"
+  - headers: {'Authorization': 'basic YWRtaW46'}
   - method: "DELETE"
 
 - test:
   - group: "User CRUD"
   - name: "Ensure user was deleted"
   - url: "/api/v1/user/testuser/"
+  - headers: {'Authorization': 'basic YWRtaW46'}
   - expected_status: [404]
 

@@ -1,9 +1,7 @@
 from urllib.parse import splitquery
 
-import falcon
-
 from .models import User
-from .utils import encode_json, decode_json
+from .utils import *
 
 __version__ = (1, 0, 0)
 __api_version__ = __version__[0]
@@ -11,12 +9,14 @@ __version_str__ = ".".join(map(str, __version__))
 api_prefix = "/api/v{}/".format(__api_version__)
 
 
+@no_auth
 class ApiInfoView():
     @falcon.after(encode_json)
     def on_get(self, req, resp):
         resp.json = {'version': str(__api_version__)}
 
 
+@no_auth
 class UserView():
     @falcon.after(encode_json)
     def on_get(self, req, resp):
@@ -37,6 +37,8 @@ class UserView():
         link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': last_page, 'per_page': per_page}))
         resp.add_link(link_target, 'last')
 
+    @auth
+    @require(roles='admin')
     @falcon.before(decode_json)
     def on_post(self, req, resp):
         username = req.json.get("username", None)
@@ -58,20 +60,22 @@ class UserView():
         resp.status = falcon.HTTP_CREATED
 
 
+@auth
 class UserDetailView():
-    @falcon.after(encode_json)
-    def on_get(self, req, resp, username):
-        resp.json = self._get_user(username)
-
     def _get_user(self, username):
         usr = User.get(username=username)
         if usr is None:
             raise falcon.HTTPNotFound()
         return usr
 
+    @falcon.after(encode_json)
+    def on_get(self, req, resp, username):
+        resp.json = self._get_user(username)
+
+    @require(users=SpecialRequire.current_user)
     @falcon.before(decode_json)
     @falcon.after(encode_json)
-    def on_put(self, req, resp, username):
+    def on_put(self, req, resp, username=None):
         usr = User.get(username=username)
         if usr is None:
             raise falcon.HTTPNotFound()
@@ -89,6 +93,7 @@ class UserDetailView():
         usr.save()
         resp.json = self._get_user(username)
 
+    @require(roles='admin')
     def on_delete(self, req, resp, username):
         usr = User.get(username=username)
         if usr is None:

@@ -1,10 +1,14 @@
-import falcon
-import os.path
-import mimetypes
 import logging
+import mimetypes
+import os.path
+
+import falcon
+
+from .utils import AuthMiddleware
 from .views_v1 import views_v1
 
-app = falcon.API()
+app = falcon.API(middleware=[AuthMiddleware()])
+
 
 # development server for static data, probably better to use a proper webserver like nginx or apache for production
 class StaticSink():

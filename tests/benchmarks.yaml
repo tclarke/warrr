@@ -1,0 +1,20 @@
+---
+- config:
+  - testset: "Benchmarks"
+  - generators:
+    - 'name': {type: 'random_text'}
+
+- benchmark:
+  - generator_binds: {username: name}
+  - name: "Create many users"
+  - url: "/api/v1/user/"
+  - warmup_runs: 0
+  - benchmark_runs: '100'
+  - method: "POST"
+  - body: {template: '{"username": "$username"}'}
+  - headers: {'Content-Type': 'application/json'}
+  - output_format: csv
+  - metrics:
+    - total_time: total
+    - total_time: mean
+    - total_time: mean_harmonic

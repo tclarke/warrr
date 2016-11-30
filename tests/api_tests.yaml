@@ -1,0 +1,12 @@
+---
+- config:
+    - testset: "API Tests"
+
+- test:
+    - name: "Version Test"
+    - url: "/api/v1/"
+    - validators:
+      - compare: {header: content-type, comparator: contains, expected: 'json'}
+      - compare: {jsonpath_mini: 'version', expected: '1'}
+
+- import: user_tests.yaml

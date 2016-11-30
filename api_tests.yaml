@@ -1,7 +1,0 @@
----
-- config:
-    - testset: "Smoke test"
-
-- test:
-    - name: "Basic smaketest"
-    - url: "/api/v1/"

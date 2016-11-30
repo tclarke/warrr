@@ -1,33 +1,29 @@
-import falcon
-import json
 from urllib.parse import splitquery
 
+import falcon
+
 from .models import User
+from .utils import encode_json, decode_json
 
 __version__ = (1, 0, 0)
 __api_version__ = __version__[0]
 __version_str__ = ".".join(map(str, __version__))
 api_prefix = "/api/v{}/".format(__api_version__)
 
-class RemodelJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        from remodel.models import Model
-        if isinstance(o, Model):
-            return o.fields.as_dict()
-        return json.JSONEncoder.default(self, o)
 
 class ApiInfoView():
+    @falcon.after(encode_json)
     def on_get(self, req, resp):
-       resp.body = json.dumps({'version': str(__api_version__)})
-       resp.content_type = "application/json"
+        resp.json = {'version': str(__api_version__)}
+
 
 class UserView():
+    @falcon.after(encode_json)
     def on_get(self, req, resp):
         page, per_page = int(req.get_param("page", default=0)), int(req.get_param("per_page", default=5))
-        all_users = User.all()
-        res = all_users.query.slice(page*per_page, (page+1)*per_page).run()
-        resp.body = json.dumps({'users': list(res.items)})
-        resp.content_type = "application/json"
+        res = User.slice(page * per_page, (page + 1) * per_page).run()
+        resp.json = {'users': list(res.items)}
+
         link_base = splitquery(req.uri)[0]
         link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': 0, 'per_page': per_page}))
         resp.add_link(link_target, 'first')
@@ -41,15 +37,11 @@ class UserView():
         link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': last_page, 'per_page': per_page}))
         resp.add_link(link_target, 'last')
 
+    @falcon.before(decode_json)
     def on_post(self, req, resp):
-        if req.content_type != "application/json":
-            raise falcon.HTTPUnsupportedMediaType("application/json required")
-        username = None
-        if req.content_length > 0:
-            data = json.loads(req.stream.read().decode('utf-8'))
-            username = data.get("username", None)
-            first_name = data.get("first_name", "")
-            last_name = data.get("last_name", "")
+        username = req.json.get("username", None)
+        first_name = req.json.get("first_name", "")
+        last_name = req.json.get("last_name", "")
         if username is None:
             raise falcon.HTTPBadRequest(description="No username specified")
         usr = User.get(username=username)
@@ -58,8 +50,6 @@ class UserView():
         try:
             usr = User.factory(username, first_name, last_name)
         except:
-            import logging
-            logging.exception("Create")
             raise falcon.HTTPInternalServerError("Exception adding user")
         if usr is None:
             raise falcon.HTTPInvalidParam("User already exists", "username")
@@ -69,27 +59,25 @@ class UserView():
 
 
 class UserDetailView():
+    @falcon.after(encode_json)
     def on_get(self, req, resp, username):
+        resp.json = self._get_user(username)
+
+    def _get_user(self, username):
         usr = User.get(username=username)
         if usr is None:
             raise falcon.HTTPNotFound()
-        if not req.client_accepts_json:
-            req.log_error("Client will not accept json")
-            raise falcon.HTTPNotAcceptable("Client must accept application/json")
-        resp.body = json.dumps(usr, cls=RemodelJSONEncoder)
-        resp.content_type = "application/json"
+        return usr
 
+    @falcon.before(decode_json)
+    @falcon.after(encode_json)
     def on_put(self, req, resp, username):
         usr = User.get(username=username)
         if usr is None:
             raise falcon.HTTPNotFound()
-        if req.content_type != "application/json":
-            raise falcon.HTTPUnsupportedMediaType("application/json required")
-        if req.content_length > 0:
-            data = json.loads(req.stream.read().decode('utf-8'))
-            new_username = data.get("username", None)
-            first_name = data.get("first_name", None)
-            last_name = data.get("last_name", None)
+        new_username = req.json.get("username", None)
+        first_name = req.json.get("first_name", None)
+        last_name = req.json.get("last_name", None)
         if new_username is not None and User.get(username=new_username) is not None:
             raise falcon.HTTPInvalidParam("New user name already exists", "username")
         if new_username is not None:
@@ -99,7 +87,7 @@ class UserDetailView():
         if last_name is not None:
             usr["last_name"] = last_name
         usr.save()
-        self.on_get(req, resp, username)
+        resp.json = self._get_user(username)
 
     def on_delete(self, req, resp, username):
         usr = User.get(username=username)

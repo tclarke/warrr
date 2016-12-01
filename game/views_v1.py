@@ -104,6 +104,6 @@ class UserDetailView():
 
 def views_v1():
     return [(api_prefix, ApiInfoView()),
-            (api_prefix + "user/", UserView()),
-            (api_prefix + "user/{username}/", UserDetailView()),
-           ]
+            (api_prefix + "users/", UserView()),
+            (api_prefix + "users/{username}/", UserDetailView()),
+            ]

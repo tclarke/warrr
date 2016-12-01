@@ -65,7 +65,8 @@ def require(users=None, roles=None, groups=None, current_user_key='username'):
             username = kargs.get(current_user_key, None)
             if (ident is not None) and not authorize(ident, users, roles, groups, username):
                 raise falcon.HTTPForbidden("Action not allowed",
-                                           "The specified user does not have authorization to perform this action")
+                                           "The specified user does not have authorization to perform this action",
+                                           headers={'WWW-Authenticate': 'Basic realm="Game"'})
             return fn(obj, req, *args, **kargs)
 
         return check_auth
@@ -101,4 +102,14 @@ class AuthMiddleware:
             return True
         if func is not None and getattr(func, 'use_auth', default) is False:  # func override says don't use auth
             return
-        return self._talon_mw(req, resp, params)
+        try:
+            rval = self._talon_mw(req, resp, params)
+        except falcon.HTTPForbidden:
+            raise falcon.HTTPForbidden("Forbidden",
+                                       "The specified user does not have authorization to perform this action",
+                                       headers={'WWW-Authenticate': 'Basic realm="Game"'})
+        except falcon.HTTPUnauthorized:
+            raise falcon.HTTPUnauthorized("Authentication required",
+                                          "Authentication required",
+                                          headers={'WWW-Authenticate': 'Basic realm="Game"'})
+        return rval

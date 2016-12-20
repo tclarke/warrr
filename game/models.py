@@ -66,7 +66,10 @@ if __name__ == '__main__':
     create_indexes()
 
     logging.info("Load initial data")
-    Piece.factory('Headquarters', 0., ['https://commons.wikimedia.org/wiki/File:NATO_Map_Symbol_-_Headquarters_Unit.svg#/media/File:NATO_Map_Symbol_-_Headquarters_Unit.svg'])
-    Piece.factory('Light Infantry', 10., ['https://commons.wikimedia.org/wiki/File:NATO_Map_Symbol_-_Infantry_(Light).svg#/media/File:NATO_Map_Symbol_-_Infantry_(Light).svg'])
-    Piece.factory('Mounted Infantry', 30., ['https://commons.wikimedia.org/wiki/File:NATO_Map_Symbol_-_Mounted_Infantry.svg#/media/File:NATO_Map_Symbol_-_Mounted_Infantry.svg'])
+    Piece.factory('Headquarters', 0.,
+                  ['https://upload.wikimedia.org/wikipedia/commons/e/e3/NATO_Map_Symbol_-_Headquarters_Unit.svg'])
+    Piece.factory('Light Infantry', 10.,
+                  ['https://upload.wikimedia.org/wikipedia/commons/2/23/NATO_Map_Symbol_-_Infantry_%28Light%29.svg'])
+    Piece.factory('Mounted Infantry', 30.,
+                  ['https://commons.wikimedia.org/wiki/File%3ANATO_Map_Symbol_-_Mounted_Infantry.svg'])
     User.factory('admin', roles=["admin"])

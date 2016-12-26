@@ -5,7 +5,7 @@ import os.path
 import falcon
 
 from .utils import AuthMiddleware
-from .views_v1 import views_v1
+from .views import api
 
 app = falcon.API(middleware=[AuthMiddleware()])
 
@@ -36,5 +36,5 @@ class StaticSink():
 
 static = StaticSink(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static")))
 app.add_sink(static, '/')
-for p, r in views_v1():
+for p, r in api():
     app.add_route(p, r)

@@ -1,19 +1,9 @@
 from urllib.parse import splitquery
 
-from .models import User
-from .utils import *
+import falcon
 
-__version__ = (1, 0, 0)
-__api_version__ = __version__[0]
-__version_str__ = ".".join(map(str, __version__))
-api_prefix = "/api/v{}/".format(__api_version__)
-
-
-@no_auth
-class ApiInfoView():
-    @falcon.after(encode_json)
-    def on_get(self, req, resp):
-        resp.json = {'version': str(__api_version__)}
+from ..models import User
+from ..utils import no_auth, encode_json, auth, require, decode_json, SpecialRequire
 
 
 @no_auth
@@ -29,10 +19,10 @@ class UserView():
         resp.add_link(link_target, 'first')
         last_page = (User.count() - (1 if User.count() % per_page == 0 else 0)) // per_page
         if page > 0:
-            link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': page-1, 'per_page': per_page}))
+            link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': page - 1, 'per_page': per_page}))
             resp.add_link(link_target, 'prev')
         if page < last_page:
-            link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': page+1, 'per_page': per_page}))
+            link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': page + 1, 'per_page': per_page}))
             resp.add_link(link_target, 'next')
         link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': last_page, 'per_page': per_page}))
         resp.add_link(link_target, 'last')
@@ -102,8 +92,7 @@ class UserDetailView():
         resp.status = falcon.HTTP_NO_CONTENT
 
 
-def views_v1():
-    return [(api_prefix, ApiInfoView()),
-            (api_prefix + "users/", UserView()),
+def api(api_prefix):
+    return [(api_prefix + "users/", UserView()),
             (api_prefix + "users/{username}/", UserDetailView()),
             ]

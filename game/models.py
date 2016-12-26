@@ -38,8 +38,15 @@ class State(Model):
     has_one = ('User',)
 
 
+class Board(Model):
+    @staticmethod
+    def factory():
+        return Board.create()
+
+
 class Game(Model):
     has_many = ('State', 'User',)
+    has_one = ('Board',)
 
 
 if __name__ == '__main__':

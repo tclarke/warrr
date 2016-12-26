@@ -1,0 +1,11 @@
+---
+- config:
+  - testset: "Board API tests"
+
+- test:
+  - group: "Board CRUD"
+  - name: "Create board"
+  - url: "/api/v1/boards/"
+  - method: "POST"
+  - body: '{}'
+  - headers: {'Content-Type': 'application/json', 'Authorization': 'basic YWRtaW46'}

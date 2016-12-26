@@ -10,3 +10,4 @@
       - compare: {jsonpath_mini: 'version', expected: '1'}
 
 - import: user_tests.yaml
+- import: board_tests.yaml

@@ -1,18 +1,26 @@
 @import '../../styles/main.less';
 
-#add-marker {
+#add-friendly {
   margin: 20px 0 0 370px;
   .map-button;
+  color: blue;
+}
+
+#add-neutral {
+  margin: 20px 0 0 410px;
+  .map-button;
+  color: green;
+}
+
+#add-hostile {
+  margin: 20px 0 0 450px;
+  .map-button;
+  color: red;
 }
 
 #remove-marker {
-  margin: 20px 0 0 410px;
+  margin: 20px 0 0 490px;
   .map-button;
-}
-
-.markerEnemy {
-  background-color: red;
-  width: inherit;
 }
 
 .markerFriendly {
@@ -22,5 +30,10 @@
 
 .markerNeutral {
   background-color: green;
+  width: inherit;
+}
+
+.markerHostile {
+  background-color: red;
   width: inherit;
 }

@@ -13,30 +13,36 @@ import {Map, MouseEvent, Marker} from "leaflet";
     encapsulation: ViewEncapsulation.None
 })
 export class MarkerComponent {
-    editing: boolean;
+    friendly: boolean;
+    neutral: boolean;
+    hostile: boolean;
     removing: boolean;
     markerCount: number;
 
     constructor(private el: ElementRef, private renderer: Renderer, private mapService: MapService) {
-        this.editing = false;
+        this.friendly = false;
+        this.neutral = false;
+        this.hostile = false;
         this.removing = false;
         this.markerCount = 0;
     }
 
     ngOnInit() {
-        this.mapService.disableMouseEvent("add-marker");
+        this.mapService.disableMouseEvent("add-friendly");
+        this.mapService.disableMouseEvent("add-neutral");
+        this.mapService.disableMouseEvent("add-hostile");
         this.mapService.disableMouseEvent("remove-marker");
         this.renderer.setElementStyle(this.el.nativeElement, "backgroundColor", "yellow");
     }
 
     Initialize() {
         this.mapService.map.on("click", (e: MouseEvent) => {
-            if (this.editing) {
+            if (this.friendly || this.neutral || this.hostile) {
                 let marker = L.marker(e.latlng, {
                     icon:      L.icon({
                         iconSize:  [50, -1],
                         iconUrl:   "https://upload.wikimedia.org/wikipedia/commons/2/23/NATO_Map_Symbol_-_Infantry_%28Light%29.svg",
-                        className: "markerEnemy"
+                        className: (this.friendly ? "markerFriendly" : (this.neutral ? "markerNeutral" : (this.hostile ? "markerHostile" : "")))
                     }),
                     draggable: true
                 })
@@ -58,19 +64,23 @@ export class MarkerComponent {
         });
     }
 
-    toggleEditing() {
-        this.editing = !this.editing;
+    toggleFriendly() {
+        this.friendly = !this.friendly;
+        this.neutral = this.hostile = this.removing = false;
+    }
 
-        if (this.editing && this.removing) {
-            this.removing = false;
-        }
+    toggleNeutral() {
+        this.neutral = !this.neutral;
+        this.friendly = this.hostile = this.removing = false;
+    }
+
+    toggleHostile() {
+        this.hostile = !this.hostile;
+        this.friendly = this.neutral = this.removing = false;
     }
 
     toggleRemoving() {
         this.removing = !this.removing;
-
-        if (this.editing && this.removing) {
-            this.editing = false;
-        }
+        this.friendly = this.neutral = this.hostile = false;
     }
 }

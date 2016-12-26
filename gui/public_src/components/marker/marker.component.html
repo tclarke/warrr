@@ -1,5 +1,15 @@
-<button id="add-marker" class="btn btn-default on-map" [class.btn-primary]="editing"
-        title="Add Marker" (click)="toggleEditing()" btnCheckbox>
+<button id="add-friendly" class="btn btn-default on-map" [class.btn-primary]="friendly"
+        title="Add Friendly" (click)="toggleFriendly()" btnCheckbox>
+    <i class="fa fa-map-marker fa"></i>
+</button>
+
+<button id="add-neutral" class="btn btn-default on-map" [class.btn-primary]="neutral"
+        title="Add Neutral" (click)="toggleNeutral()" btnCheckbox>
+    <i class="fa fa-map-marker fa"></i>
+</button>
+
+<button id="add-hostile" class="btn btn-default on-map" [class.btn-primary]="hostile"
+        title="Add Hostile" (click)="toggleHostile()" btnCheckbox>
     <i class="fa fa-map-marker fa"></i>
 </button>
 

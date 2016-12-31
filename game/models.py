@@ -78,5 +78,5 @@ if __name__ == '__main__':
     Piece.factory('Light Infantry', 10.,
                   ['https://upload.wikimedia.org/wikipedia/commons/2/23/NATO_Map_Symbol_-_Infantry_%28Light%29.svg'])
     Piece.factory('Mounted Infantry', 30.,
-                  ['https://commons.wikimedia.org/wiki/File%3ANATO_Map_Symbol_-_Mounted_Infantry.svg'])
+                  ['https://upload.wikimedia.org/wikipedia/commons/3/39/NATO_Map_Symbol_-_Mounted_Infantry.svg'])
     User.factory('admin', roles=["admin"])

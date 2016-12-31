@@ -12,3 +12,11 @@
         <i class="map-icon material-icons">add_location</i>
     </md-button-toggle>
 </md-button-toggle-group>
+
+<div id="markerType" class="on-map">
+    <md-select placeholder="Marker Type" name="markerType" [(ngModel)]="markerUrl">
+        <md-option *ngFor="let mtype of markerTypes" [value]="mtype.url">
+            {{mtype.name}}
+        </md-option>
+    </md-select>
+</div>

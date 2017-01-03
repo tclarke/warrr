@@ -1,0 +1,18 @@
+---
+- config:
+  - testset: "Piece API tests"
+
+- test:
+  - group: "Piece CRUD"
+  - name: "Get all pieces default per page"
+  - url: "/api/v1/pieces/"
+
+- test:
+  - group: "Piece CRUD"
+  - name: "Get all pieces 1 per page"
+  - url: "/api/v1/pieces/?per_page=1"
+
+- test:
+  - group: "Piece CRUD"
+  - name: "Get all pieces"
+  - url: "/api/v1/pieces/?per_page=-1"

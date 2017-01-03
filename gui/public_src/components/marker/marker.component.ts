@@ -1,5 +1,6 @@
-import {Component, ElementRef, Renderer, ViewEncapsulation} from "@angular/core";
+import {Component, ElementRef, Input, Renderer, ViewEncapsulation} from "@angular/core";
 import {MapService} from "../../services/map.service";
+import {MarkerService} from "../../services/marker.service";
 import {Map, MouseEvent, Marker} from "leaflet";
 
 @Component({
@@ -16,19 +17,10 @@ export class MarkerComponent {
     markerCount: number;
     inputMode: string;
     markerUrl: string;
-    markerTypes = [
-        {name:   "foo",
-            url: "https://upload.wikimedia.org/wikipedia/commons/e/e3/NATO_Map_Symbol_-_Headquarters_Unit.svg"
-        },
-        {name:   "bar",
-            url: "https://upload.wikimedia.org/wikipedia/commons/2/23/NATO_Map_Symbol_-_Infantry_%28Light%29.svg"
-        },
-        {name:   "ack ick",
-            url: "https://upload.wikimedia.org/wikipedia/commons/3/39/NATO_Map_Symbol_-_Mounted_Infantry.svg"
-        },
-    ];
+    @Input() markerTypes = [];
 
-    constructor(private el: ElementRef, private renderer: Renderer, private mapService: MapService) {
+    constructor(private markerService: MarkerService,
+                private el: ElementRef, private renderer: Renderer, private mapService: MapService) {
         this.markerCount = 0;
         this.inputMode = "";
         this.markerUrl = "";
@@ -36,11 +28,16 @@ export class MarkerComponent {
 
     ngOnInit() {
         this.renderer.setElementStyle(this.el.nativeElement, "backgroundColor", "yellow");
+        this.markerService.getMarkerTypes()
+            .subscribe(
+                markerTypes => this.markerTypes = markerTypes,
+                error => console.error(<any>error)
+            );
     }
 
     Initialize() {
         this.mapService.map.on("click", (e: MouseEvent) => {
-            if (this.inputMode == "friendly" || this.inputMode == "neutral" || this.inputMode == "hostile") {
+            if (this.inputMode === "friendly" || this.inputMode === "neutral" || this.inputMode === "hostile") {
                 let marker = L.marker(e.latlng, {
                     icon:      L.icon({
                         iconSize:  [50, -1],
@@ -58,7 +55,7 @@ export class MarkerComponent {
                 this.markerCount += 1;
 
                 marker.on("click", (event: MouseEvent) => {
-                    if (this.inputMode == "remove") {
+                    if (this.inputMode === "remove") {
                         this.mapService.map.removeLayer(marker);
                         this.markerCount -= 1;
                     }

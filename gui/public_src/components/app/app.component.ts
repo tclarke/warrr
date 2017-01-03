@@ -1,5 +1,6 @@
 import {Component, ViewChild} from "@angular/core";
 import {MarkerComponent} from "../marker/marker.component";
+import {MarkerService} from "../../services/marker.service";
 import {MapService} from "../../services/map.service";
 import {GeocodingService} from "../../services/geocoding.service";
 
@@ -15,7 +16,9 @@ export class AppComponent {
 
     @ViewChild(MarkerComponent) markerComponent: MarkerComponent;
 
-    constructor(private mapService: MapService, private geocoder: GeocodingService) {
+    constructor(private markerService: MarkerService,
+                private mapService: MapService,
+                private geocoder: GeocodingService) {
     }
 
     ngOnInit() {

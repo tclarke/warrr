@@ -3,11 +3,13 @@ import mimetypes
 import os.path
 
 import falcon
+from falcon_cors import CORS
 
 from .utils import AuthMiddleware
 from .views import api
 
-app = falcon.API(middleware=[AuthMiddleware()])
+cors = CORS(allow_all_origins=True)
+app = falcon.API(middleware=[AuthMiddleware(), cors.middleware])
 
 
 # development server for static data, probably better to use a proper webserver like nginx or apache for production

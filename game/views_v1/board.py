@@ -7,7 +7,7 @@ from ..utils import encode_json, auth, decode_json
 
 
 @auth
-class BoardView():
+class BoardView:
     @falcon.after(encode_json)
     def on_get(self, req, resp):
         page, per_page = int(req.get_param("page", default=0)), int(req.get_param("per_page", default=5))

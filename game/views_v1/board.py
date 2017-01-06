@@ -1,8 +1,10 @@
 from urllib.parse import splitquery
 
+import aiohttp
+import asyncio
 import falcon
 
-from ..models import Board
+from ..models import Board, Piece
 from ..utils import encode_json, auth, decode_json
 
 
@@ -27,6 +29,7 @@ class BoardView:
         link_target = "{}{}".format(link_base, falcon.util.to_query_str({'page': last_page, 'per_page': per_page}))
         resp.add_link(link_target, 'last')
 
+    @falcon.after(encode_json)
     @falcon.before(decode_json)
     def on_post(self, req, resp):
         try:
@@ -35,11 +38,52 @@ class BoardView:
             raise falcon.HTTPInternalServerError("Exception creating board: {}".format(e))
         if board is None:
             raise falcon.HTTPInternalServerError("Unable to create board")
+        board['rules_url'] = req.json["rules_url"]
         link_base = splitquery(req.url)[0]
-        resp.location = "{}/{}/".format(link_base, board.fields.id)
+        resp.json = board
+        resp.location = "{}/{}/".format(link_base, board['id'])
         resp.status = falcon.HTTP_CREATED
+
+@auth
+class BoardDetailView:
+    @falcon.after(encode_json)
+    @falcon.before(decode_json)
+    async def on_put(self, req, resp, board_id):
+        board = Board.get(id=board_id)
+        if board is None:
+            raise falcon.HTTPNotFound()
+        friendly = [(p['location'], Piece.get(p['id'])) for p in req.json.get("friendly", [])]
+        neutral = [(p['location'], Piece.get(p['id'])) for p in req.json.get("neutral", [])]
+        hostile = [(p['location'], Piece.get(p['id'])) for p in req.json.get("hostile", [])]
+        board.reset()
+        board.add_pieces(friendly, 'friendly')
+        board.add_pieces(neutral, 'neutral')
+        board.add_pieces(hostile, 'hostile')
+        try:
+            future = asyncio.Future()
+            await asyncio.ensure_future(BoardDetailView.validate(future, board))
+            status = future.result()
+            if status == 200:
+                resp.json = board
+            else:
+                resp.status = status
+        except Exception as e:
+            raise falcon.HTTPServiceUnavailable(e)
+
+    @staticmethod
+    async def validate(future, board):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(board.get('rules_url', '') + "validation/") as resp:
+                    if resp.status == 200:
+                        board['valid'] = True
+                        board.save()
+                    future.set_result(resp.status)
+        except Exception as e:
+            future.set_exception(e)
 
 
 def api(api_prefix):
     return [(api_prefix + "boards/", BoardView()),
+            (api_prefix + "boards/{board_id}/", BoardDetailView())
             ]

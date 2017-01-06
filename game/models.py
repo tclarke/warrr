@@ -6,7 +6,7 @@ pool.configure(db='game')
 
 
 class Piece(Model):
-    belongs_to = ('State',)
+    belongs_to = ('State', 'Board')
 
     @staticmethod
     def factory(name, dist, image_urls):
@@ -39,9 +39,21 @@ class State(Model):
 
 
 class Board(Model):
+    has_many = ('Piece',)
+
+    def add_pieces(self, pieces, typ):
+        for location, p in pieces:
+            if self['pieces'].get(p['id']) is None:
+                self['pieces'].add(p)
+            self[typ].append((location, p['id']))
+
+    def reset(self):
+        for k in ['pieces', 'friendly', 'neutral', 'hostile']:
+            self[k].clear()
+
     @staticmethod
     def factory():
-        return Board.create()
+        return Board.create(friendly=[], neutral=[], hostile=[], board_url="")
 
 
 class Game(Model):

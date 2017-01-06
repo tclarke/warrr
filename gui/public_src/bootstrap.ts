@@ -7,6 +7,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {AppComponent} from "./components/app/app.component";
 import {NavigatorComponent} from "./components/navigator/navigator.component";
 import {MarkerComponent} from "./components/marker/marker.component";
+import {BoardService} from "./services/board.service";
 import {MapService} from "./services/map.service";
 import {MarkerService} from "./services/marker.service";
 import {GeocodingService} from "./services/geocoding.service";
@@ -25,6 +26,7 @@ import {GeocodingService} from "./services/geocoding.service";
         MarkerComponent
     ],
     providers:    [
+        BoardService,
         MapService,
         GeocodingService,
         MarkerService

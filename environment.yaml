@@ -12,7 +12,6 @@ dependencies:
 - conda-forge::blas=1.1=openblas
 - conda-forge::curl=7.49.1=1
 - conda-forge::cython=0.25.1=py35_0
-- conda-forge::falcon=1.1.0=py35_0
 - conda-forge::ffmpeg=2.8.6=2
 - conda-forge::libgfortran=3.0.0=0
 - conda-forge::numpy=1.11.2=py35_blas_openblas_200
@@ -22,6 +21,7 @@ dependencies:
 - conda-forge::pytest=3.0.4=py35_0
 - conda-forge::python-mimeparse=1.5.2=py35_0
 - conda-forge::x264=20131217=1
+- hug
 - decorator=4.0.10=py35_0
 - gunicorn=19.6.0=py35_0
 - ipython=5.1.0=py35_1

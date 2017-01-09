@@ -6,7 +6,7 @@ pool.configure(db='game')
 
 
 class Piece(Model):
-    belongs_to = ('State',)
+    belongs_to = ('State', 'Board')
 
     @staticmethod
     def factory(name, dist, image_urls):
@@ -39,9 +39,21 @@ class State(Model):
 
 
 class Board(Model):
+    has_many = ('Piece',)
+
+    def add_pieces(self, pieces, typ):
+        for location, p in pieces:
+            if self['pieces'].get(p['id']) is None:
+                self['pieces'].add(p)
+            self[typ].append((location, p['id']))
+
+    def reset(self):
+        for k in ['pieces', 'friendly', 'neutral', 'hostile']:
+            self[k].clear()
+
     @staticmethod
     def factory():
-        return Board.create()
+        return Board.create(friendly=[], neutral=[], hostile=[], rules_url="")
 
 
 class Game(Model):
@@ -78,5 +90,5 @@ if __name__ == '__main__':
     Piece.factory('Light Infantry', 10.,
                   ['https://upload.wikimedia.org/wikipedia/commons/2/23/NATO_Map_Symbol_-_Infantry_%28Light%29.svg'])
     Piece.factory('Mounted Infantry', 30.,
-                  ['https://commons.wikimedia.org/wiki/File%3ANATO_Map_Symbol_-_Mounted_Infantry.svg'])
+                  ['https://upload.wikimedia.org/wikipedia/commons/3/39/NATO_Map_Symbol_-_Mounted_Infantry.svg'])
     User.factory('admin', roles=["admin"])

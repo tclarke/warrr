@@ -1,5 +1,8 @@
 import {Component, ViewChild} from "@angular/core";
 import {MarkerComponent} from "../marker/marker.component";
+import {Board} from "../../core/board.class";
+import {BoardService} from "../../services/board.service";
+import {MarkerService} from "../../services/marker.service";
 import {MapService} from "../../services/map.service";
 import {GeocodingService} from "../../services/geocoding.service";
 
@@ -12,10 +15,15 @@ import {GeocodingService} from "../../services/geocoding.service";
     providers: []
 })
 export class AppComponent {
+    board: Board;
 
     @ViewChild(MarkerComponent) markerComponent: MarkerComponent;
 
-    constructor(private mapService: MapService, private geocoder: GeocodingService) {
+    constructor(private markerService: MarkerService,
+                private boardService: BoardService,
+                private mapService: MapService,
+                private geocoder: GeocodingService) {
+        this.board = null;
     }
 
     ngOnInit() {
@@ -42,5 +50,16 @@ export class AppComponent {
 
     ngAfterViewInit() {
         this.markerComponent.Initialize();
+    }
+
+    saveBoardState() {
+        if (this.board === null) {
+            this.boardService.createBoard()
+                .map(board => {
+                    this.board = board;
+                    debugger;
+                });
+        }
+        this.board.saveState();
     }
 }

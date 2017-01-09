@@ -1,19 +1,22 @@
-<button id="add-friendly" class="btn btn-default on-map" [class.btn-primary]="friendly"
-        title="Add Friendly" (click)="toggleFriendly()" btnCheckbox>
-    <i class="fa fa-map-marker fa"></i>
-</button>
+<md-button-toggle-group id="inputMode" [(ngModel)]="inputMode">
+    <md-button-toggle value="friendly" id="addFriendly" class="btn on-map" title="Add Friendly">
+        <i class="map-icon material-icons">add_location</i>
+    </md-button-toggle>
+    <md-button-toggle value="neutral" id="addNeutral" class="btn on-map" title="Add Neutral">
+        <i class="map-icon material-icons">add_location</i>
+    </md-button-toggle>
+    <md-button-toggle value="hostile" id="addHostile" class="btn on-map" title="Add Hostile">
+        <i class="map-icon material-icons">add_location</i>
+    </md-button-toggle>
+    <md-button-toggle value="remove" id="removeMarker" class="btn on-map" title="Remove Marker">
+        <i class="map-icon material-icons">add_location</i>
+    </md-button-toggle>
+</md-button-toggle-group>
 
-<button id="add-neutral" class="btn btn-default on-map" [class.btn-primary]="neutral"
-        title="Add Neutral" (click)="toggleNeutral()" btnCheckbox>
-    <i class="fa fa-map-marker fa"></i>
-</button>
-
-<button id="add-hostile" class="btn btn-default on-map" [class.btn-primary]="hostile"
-        title="Add Hostile" (click)="toggleHostile()" btnCheckbox>
-    <i class="fa fa-map-marker fa"></i>
-</button>
-
-<button id="remove-marker" class="btn btn-default on-map" [class.btn-primary]="removing"
-        title="Remove Marker" (click)="toggleRemoving()" btnCheckbox>
-    <i class="fa fa-trash fa"></i>
-</button>
+<div id="markerType" class="on-map">
+    <md-select placeholder="Marker Type" name="markerType" [(ngModel)]="markerUrl">
+        <md-option *ngFor="let mtype of markerTypes" [value]="mtype.url">
+            {{mtype.name}}
+        </md-option>
+    </md-select>
+</div>

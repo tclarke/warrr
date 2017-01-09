@@ -42,14 +42,27 @@ def board_view_post(body=None, request=None, response=None):
     if board is None:
         raise falcon.HTTPInternalServerError("Unable to create board")
     board['rules_url'] = body["rules_url"]
+    board.save()
     link_base = splitquery(request.url)[0]
     response.location = "{}/{}/".format(link_base, board['id'])
     response.status = falcon.HTTP_CREATED
     return board.fields.as_dict()
 
 
-@hug.put("/boards/{board_id}")
-async def update_board_configuration(board_id, body, response):
+@hug.get("/boards/{board_id}/")
+def get_board_configuration(board_id: str):
+    """Get the board state object for the specified board ID"""
+
+    board = Board.get(id=board_id)
+    if board is None:
+        raise falcon.HTTPNotFound()
+    return board.fields.as_dict()
+
+
+@hug.put("/boards/{board_id}/")
+async def update_board_configuration(board_id: str, body, response):
+    """Board piece positions and validate with the rules service."""
+
     board = Board.get(id=board_id)
     if board is None:
         raise falcon.HTTPNotFound()
@@ -62,17 +75,16 @@ async def update_board_configuration(board_id, body, response):
     board.add_pieces(hostile, 'hostile')
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(board.get('rules_url', '') + 'validation/') as resp:
+            async with session.post(board.get('rules_url', '') + 'validation/', data=board.fields.as_dict()) as resp:
                 if resp.status == 200:
                     board['valid'] = True
                     board.save()
+                    board = board.fields.as_dict()
                 else:
                     response.status = resp.status
                     board = None
-            response.status = status
         except Exception as e:
             raise falcon.HTTPServiceUnavailable("Rules resource unavailable",
-                                                "The rules url could not be reached, ensure the rules "
-                                                "service is available.",
+                                                str(e),
                                                 300)
     return board

@@ -53,7 +53,7 @@ class Board(Model):
 
     @staticmethod
     def factory():
-        return Board.create(friendly=[], neutral=[], hostile=[], board_url="")
+        return Board.create(friendly=[], neutral=[], hostile=[], rules_url="")
 
 
 class Game(Model):

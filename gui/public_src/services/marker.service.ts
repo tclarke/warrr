@@ -6,7 +6,7 @@ import "rxjs/add/operator/mergeMap";
 
 @Injectable()
 export class MarkerService {
-    private baseUrl = "http://localhost:8000/api/v1/";
+    private baseUrl = "http://localhost:8000/v1/";
 
     constructor(private http: Http) {
     }

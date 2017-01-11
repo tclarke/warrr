@@ -12,6 +12,6 @@ export class Board {
         let state = {
                 id: this.id,
             };
-        this.boardService.saveState(state);
+        return this.boardService.saveState(state);
     }
 }

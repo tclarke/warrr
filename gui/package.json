@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/haoliangyu/angular2-leaflet-starter#readme",
   "scripts": {
-    "start": "webpack-dev-server --port 8100 --host 0.0.0.0 --public ec2-52-14-36-107.us-east-2.compute.amazonaws.com --content-base public"
+    "start": "webpack-dev-server --port 8200 --host 0.0.0.0 --content-base public"
   },
   "dependencies": {
     "@angular/common": "^2.2.0",

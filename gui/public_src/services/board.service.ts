@@ -7,22 +7,28 @@ import "rxjs/add/operator/mergeMap";
 
 @Injectable()
 export class BoardService {
-    private baseUrl = "http://localhost:8000/api/v1/";
+    private baseUrl = "http://localhost:8000/v1/";
 
     constructor(private http: Http) {
     }
 
     createBoard(): Observable<Board> {
         return this.http
-            .post(this.baseUrl + "/boards/", {})
-            .map(res => res.json())
+            .post(this.baseUrl + "boards/", {"rules_url": "http://localhost:8100/v1/validation/"})
+            .map(res => {
+                return res.json();
+            })
             .map(result => {
                 return new Board(result, this);
             });
     }
 
     saveState(state) {
+        let url = this.baseUrl + "boards/" + state.id + "/";
         return this.http
-            .post(this.baseUrl + "/boards/" + state.id, state)
+            .put(url, state)
+            .map(res => res.json())
+            .map(result => {
+            });
     }
 }

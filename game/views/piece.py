@@ -12,7 +12,7 @@ def piece_view_get(page: hug.types.number = 0, per_page: hug.types.number = 5, r
 
     resp_body = {}
     if per_page < 0:
-        resp_body['pieces'] = list(Piece.objects.all())
+        resp_body['pieces'] = [p.fields.as_dict() for p in Piece.objects.all()]
     else:
         res = Piece.slice(page * per_page, (page + 1) * per_page).run()
         resp_body['pieces'] = list(res.items)

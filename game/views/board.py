@@ -32,7 +32,7 @@ def board_view_get(page: hug.types.number = 0, per_page: hug.types.number = 5, r
 def board_view_post(body=None, request=None, response=None):
     """Create a new board with a specified rules URL."""
 
-    if body is None or body == "":
+    if body is None or body == "" or "rules_url" not in body:
         raise falcon.HTTPInvalidParam("Must specify a rules_url", "rules_url")
     try:
         board = Board.factory()
@@ -75,14 +75,15 @@ async def update_board_configuration(board_id: str, body, response):
     board.add_pieces(hostile, 'hostile')
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(board.get('rules_url', '') + 'validation/', data=board.fields.as_dict()) as resp:
+            async with session.post(board.get('rules_url', ''), data=board.fields.as_dict()) as resp:
                 if resp.status == 200:
                     board['valid'] = True
                     board.save()
                     board = board.fields.as_dict()
                 else:
-                    response.status = resp.status
-                    board = None
+                    response.status = falcon.__dict__.get('HTTP_{0}'.format(resp.status),
+                                                          falcon.HTTPInternalServerError)
+                    board = {'url': board.get('rules_url', '')}
         except Exception as e:
             raise falcon.HTTPServiceUnavailable("Rules resource unavailable",
                                                 str(e),

@@ -55,11 +55,14 @@ export class AppComponent {
     saveBoardState() {
         if (this.board === null) {
             this.boardService.createBoard()
-                .map(board => {
+                .subscribe(board => {
                     this.board = board;
-                    debugger;
+                    this.board.saveState().subscribe(board => {
+                    });
                 });
+        } else {
+            this.board.saveState().subscribe(board => {
+            });
         }
-        this.board.saveState();
     }
 }

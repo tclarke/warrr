@@ -14,7 +14,8 @@ def api_info_view():
 
 
 @hug.post('/validation/', versions=1)
-def validate_board(body):
+def validate_board(body) -> hug.types.json:
+    """Validate a board layout."""
     if body is None or 'id' not in body:
         raise falcon.HTTPInvalidParam("Must provide a valid board state", "id")
     return {'valid': True, 'id': body['id']}

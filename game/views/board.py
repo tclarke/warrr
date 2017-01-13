@@ -50,7 +50,7 @@ def board_view_post(body=None, request=None, response=None):
 
 
 @hug.get("/boards/{board_id}/")
-def get_board_configuration(board_id: str):
+def get_board_configuration(board_id: hug.types.uuid):
     """Get the board state object for the specified board ID"""
 
     board = Board.get(id=board_id)
@@ -60,7 +60,7 @@ def get_board_configuration(board_id: str):
 
 
 @hug.put("/boards/{board_id}/")
-async def update_board_configuration(board_id: str, body, response):
+async def update_board_configuration(board_id: hug.types.uuid, body, response):
     """Board piece positions and validate with the rules service."""
 
     board = Board.get(id=board_id)

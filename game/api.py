@@ -13,8 +13,8 @@ api.http.output_format = hug.output_format.pretty_json
 
 
 @hug.get('/', versions=1)
-def api_info_view():
-    return {'version': "1.0.0"}
+def api_info_view(docs: hug.directives.documentation):
+    return docs
 
 
 @hug.extend_api()

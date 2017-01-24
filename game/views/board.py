@@ -4,6 +4,7 @@ import aiohttp
 import falcon.util
 import hug
 
+import auth
 from ..models import Board, Piece
 
 
@@ -28,10 +29,16 @@ def board_view_get(page: hug.types.number = 0, per_page: hug.types.number = 5, r
     return {'boards': list(res.items)}
 
 
-@hug.post('/boards/', versions=1)
-def board_view_post(body=None, request=None, response=None):
+@hug.post('/boards/', versions=1, requires=auth.token_authentication)
+def board_view_post(user: hug.directives.user, body=None, request=None, response=None):
     """Create a new board with a specified rules URL."""
 
+    if not user:
+        raise falcon.HTTPUnauthorized("Invalid user", "User must be logged in to create a board.")
+    if 'create' not in user['roles']:
+        raise falcon.HTTPUnauthorized("Insufficient roles",
+                                      "This operation requires the 'create' role which user {0} does not have.".format(
+                                          user['username']))
     if body is None or body == "" or "rules_url" not in body:
         raise falcon.HTTPInvalidParam("Must specify a rules_url", "rules_url")
     try:

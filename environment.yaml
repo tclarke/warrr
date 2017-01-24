@@ -88,6 +88,7 @@ dependencies:
   - prompt-toolkit==1.0.8
   - pycares==2.1.1
   - pyflakes==0.8.1
+  - pyjwt
   - pyresttest==1.7.1
   - pysandra-unit==0.4.1
   - python-dateutil==2.2
